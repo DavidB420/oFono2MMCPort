@@ -4,7 +4,8 @@ BINDIR ?= $(PREFIX)/bin
 SYSTEMD_DIR = /usr/lib/systemd/system
 POLKIT_DIR = /etc/polkit-1/localauthority/10-vendor.d
 
-MAIN = main.py
+MAIN = main.c
+MAINOUTPUT = main
 OFONO2MM_DIR = ofono2mm
 DBUS_XML = dbus.xml
 OFONO_XML_FILES = ofono.xml ofono_modem.xml ofono_operator.xml ofono_context.xml
@@ -15,6 +16,9 @@ POLKIT_PKLA = extra/ofono2mm-radio.pkla
 
 all:
 	@echo "Run 'make install' to install the files."
+
+build:
+	gcc $(MAIN) -o $(MAINOUTPUT) 
 
 install:
 	install -d $(LIBDIR)/ofono2mm
