@@ -1,11 +1,13 @@
 #ifndef MMINTERFACE_H
 #define MMINTERFACE_H
 
-class MMInteface{
-	public:
+#include <dbus/dbus.h>
 
+class MMInteface {
+public:
+	MMInteface();
 
-}
+};
 
 
 #endif

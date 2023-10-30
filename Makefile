@@ -4,8 +4,9 @@ BINDIR ?= $(PREFIX)/bin
 SYSTEMD_DIR = /usr/lib/systemd/system
 POLKIT_DIR = /etc/polkit-1/localauthority/10-vendor.d
 
-MAIN = main.c
+MAIN = main.cpp
 MAINOUTPUT = main
+MAINPARAMS = -std=c++0x -Werror -Wall -Wextra
 OFONO2MM_DIR = ofono2mm
 DBUS_XML = dbus.xml
 OFONO_XML_FILES = ofono.xml ofono_modem.xml ofono_operator.xml ofono_context.xml
@@ -18,7 +19,7 @@ all:
 	@echo "Run 'make install' to install the files."
 
 build:
-	gcc $(MAIN) -o $(MAINOUTPUT) 
+	g++ $(MAIN) -o $(MAINOUTPUT) $(MAINPARAMS)
 
 install:
 	install -d $(LIBDIR)/ofono2mm
