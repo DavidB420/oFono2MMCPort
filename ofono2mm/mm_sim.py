@@ -16,20 +16,20 @@ class MMSimInterface(ServiceInterface):
         self.ofono_interfaces = ofono_interfaces
         self.ofono_interface_props = ofono_interface_props
         self.props = {
-                'Active': Variant('b', True),
-                'SimIdentifier': Variant('s', ''),
-                'IMSI': Variant('s', '0'),
-                'Eid': Variant('s', ''),
-                'OperatorIdentifier': Variant('s', '0'),
-                'OperatorName': Variant('s', 'Some Operator'),
-                'EmergencyNumbers': Variant('as', []),
-                'PreferredNetworks': Variant('a(su)', []),
-                'Gid1': Variant('ay', bytes()),
-                'Gid2': Variant('ay', bytes()),
-                'SimType': Variant('u', 1),
-                'EsimStatus': Variant('u', 0),
-                'Removability': Variant('u', 1)
-            }
+            'Active': Variant('b', True),
+            'SimIdentifier': Variant('s', ''),
+            'IMSI': Variant('s', '0'),
+            'Eid': Variant('s', ''),
+            'OperatorIdentifier': Variant('s', '0'),
+            'OperatorName': Variant('s', ''),
+            'EmergencyNumbers': Variant('as', []),
+            'PreferredNetworks': Variant('a(su)', []),
+            'Gid1': Variant('ay', bytes()),
+            'Gid2': Variant('ay', bytes()),
+            'SimType': Variant('u', 1),
+            'EsimStatus': Variant('u', 0),
+            'Removability': Variant('u', 1)
+        }
 
     def set_props(self):
         old_props = self.props
@@ -58,9 +58,25 @@ class MMSimInterface(ServiceInterface):
         if 'org.ofono.NetworkRegistration' in self.ofono_interface_props:
             self.props['OperatorName'] = Variant('s', self.ofono_interface_props['org.ofono.NetworkRegistration']['Name'].value if "Name" in self.ofono_interface_props['org.ofono.NetworkRegistration'] else '')
             self.props['OperatorIdentifier'] = Variant('s', self.ofono_interface_props['org.ofono.NetworkRegistration']['MobileNetworkCode'].value if "MobileNetworkCode" in self.ofono_interface_props['org.ofono.NetworkRegistration'] else '')
+
+            if 'MobileCountryCode' in self.ofono_interface_props['org.ofono.NetworkRegistration']:
+                MCC = self.ofono_interface_props['org.ofono.NetworkRegistration']['MobileCountryCode'].value
+            else:
+                MCC = ''
+
+            if 'MobileNetworkCode' in self.ofono_interface_props['org.ofono.NetworkRegistration']:
+                MNC = self.ofono_interface_props['org.ofono.NetworkRegistration']['MobileNetworkCode'].value
+            else:
+                MNC = ''
+
+            self.props['PreferredNetworks'] = Variant('a(su)', [[f"{MCC}{MNC}", 19]])
         else:
             self.props['OperatorName'] = Variant('s', '')
             self.props['OperatorIdentifier'] = Variant('s', '')
+            self.props['PreferredNetworks'] = Variant('a(su)', [])
+
+        if 'org.ofono.VoiceCallManager' in self.ofono_interface_props:
+            self.props['EmergencyNumbers'] = Variant('as', self.ofono_interface_props['org.ofono.VoiceCallManager']['EmergencyNumbers'].value if 'EmergencyNumbers' in self.ofono_interface_props['org.ofono.VoiceCallManager'] else [])
 
         for prop in self.props:
             if self.props[prop].value != old_props[prop].value:
@@ -88,6 +104,10 @@ class MMSimInterface(ServiceInterface):
     async def ChangePin(self, old_pin: 's', new_pin: 's'):
         if 'org.ofono.SimManager' in self.ofono_interfaces:
             await self.ofono_interfaces['org.ofono.SimManager'].call_change_pin('pin', old_pin, new_pin)
+
+    @method()
+    async def SetPreferredNetwork(self, preferred_networks: 'a(su)'):
+        pass # ofono has no way to actually set this info, just pass
 
     @dbus_property(access=PropertyAccess.READ)
     def Active(self) -> 'b':

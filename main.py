@@ -105,6 +105,7 @@ class MMInterface(ServiceInterface):
         mm_modem_interface.set_props()
         await mm_modem_interface.init_mm_sim_interface()
         await mm_modem_interface.init_mm_3gpp_interface()
+        await mm_modem_interface.init_mm_3gpp_ussd_interface()
         await mm_modem_interface.init_mm_3gpp_profile_manager_interface()
         await mm_modem_interface.init_mm_messaging_interface()
         await mm_modem_interface.init_mm_simple_interface()
@@ -115,6 +116,7 @@ class MMInterface(ServiceInterface):
         await mm_modem_interface.init_mm_oma_interface()
         await mm_modem_interface.init_mm_signal_interface()
         await mm_modem_interface.init_mm_location_interface()
+        await mm_modem_interface.init_mm_voice_interface()
         self.mm_modem_interfaces.append(mm_modem_interface)
         self.mm_modem_objects.append('/org/freedesktop/ModemManager1/Modem/' + str(self.i))
         self.i += 1
